@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enciclopédia dos Santos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f8f9fa; }
+        
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 40px;
+        }
+
+        .card-santo {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            height: 100%;
+        }
+        .card-santo:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+        }
+        .card-banner {
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card-img-top {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid white;
+            margin-top: -40px;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">✝️ Santos Católicos</a>
+            
+            <div class="ms-auto" id="areaLogin">
+                </div>
+        </div>
+    </nav>
+
+    <header class="hero shadow">
+        <div class="container">
+            <h1 class="fw-bold display-5">Conheça a História dos Santos</h1>
+            <p class="lead mb-4">Inspire-se com a vida, milagres e legados de fé.</p>
+            
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="input-group input-group-lg">
+                        <input type="text" id="campoBusca" class="form-control" placeholder="Buscar santo por nome..." onkeyup="filtrarSantos()">
+                        <button class="btn btn-light text-primary fw-bold" type="button">🔍</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mb-5">
+        <h3 class="fw-bold text-secondary mb-4">Santos Mais Famosos</h3>
+        
+        <div id="lista-santos" class="row g-4">
+            <p class="text-center text-muted">Carregando galeria...</p>
+        </div>
+    </div>
+
+<script>
+        // 1. CONFIGURA O BOTÃO DE LOGIN NO TOPO
+        const token = localStorage.getItem('santosToken');
+        const areaLogin = document.getElementById('areaLogin');
+
+        if (token) {
+            areaLogin.innerHTML = `<a href="admin.html" class="btn btn-primary btn-sm fw-bold">⚙️ Painel Admin</a>`;
+        } else {
+            areaLogin.innerHTML = `<a href="login.html" class="btn btn-outline-dark btn-sm fw-bold">🔒 Login Admin</a>`;
+        }
+
+        // 2. LÓGICA DE CARREGAR OS SANTOS
+        const API_URL = 'http://localhost:5101/api/santos'; 
+        let todosSantos = []; 
+
+        async function carregarSantos() {
+            try {
+                const response = await fetch(API_URL);
+                todosSantos = await response.json();
+                renderizar(todosSantos);
+            } catch (error) {
+                console.error(error);
+                document.getElementById('lista-santos').innerHTML = '<p class="text-danger text-center">Erro ao carregar (Backend desligado?).</p>';
+            }
+        }
+
+        function renderizar(lista) {
+            const divLista = document.getElementById('lista-santos');
+            divLista.innerHTML = '';
+
+            if(lista.length === 0) {
+                divLista.innerHTML = '<p class="text-center text-muted">Nenhum santo encontrado.</p>';
+                return;
+            }
+
+            lista.forEach(santo => {
+                // Tenta usar a foto do santo, se não tiver, usa placeholder
+                const foto = santo.fotoUrl || 'https://via.placeholder.com/150?text=S';
+                // Pega a cor do banner ou usa cinza padrão
+                const corBanner = santo.categoria?.corHex || '#e9ecef'; // Ajuste: category vs categoria dependendo do seu backend
+
+                const card = `
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card card-santo shadow-sm h-100">
+                            <div class="card-banner" style="background-color: ${corBanner}"></div>
+                            
+                            <div class="text-center">
+                                <img 
+                                    src="${foto}" 
+                                    class="card-img-top" 
+                                    alt="${santo.nome}"
+                                    onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=S';"
+                                >
+                            </div>
+
+                            <div class="card-body text-center">
+                                <h5 class="card-title fw-bold text-dark">${santo.nome}</h5>
+                                <p class="card-text small text-muted text-truncate">${santo.titulo}</p>
+                                <a href="detalhes.html?id=${santo.id}" class="btn btn-sm btn-outline-dark mt-2 rounded-pill px-4">Ler História</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                divLista.innerHTML += card;
+            });
+        }
+
+        function filtrarSantos() {
+            const termo = document.getElementById('campoBusca').value.toLowerCase();
+            const filtrados = todosSantos.filter(santo => 
+                santo.nome.toLowerCase().includes(termo) || 
+                santo.titulo.toLowerCase().includes(termo)
+            );
+            renderizar(filtrados);
+        }
+
+        carregarSantos();
+    </script>
+</body>
+</html>

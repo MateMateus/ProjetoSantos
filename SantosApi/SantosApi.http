@@ -1,0 +1,6 @@
+@SantosApi_HostAddress = http://localhost:5101
+
+GET {{SantosApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

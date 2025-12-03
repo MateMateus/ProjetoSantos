@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "3qbwkwZo2FoyELYiiLHzOfNDCg2qVUr8Ht9qQCeOZZo=",
+  "Source": "SantosApi",
+  "BasePath": "_content/SantosApi",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
