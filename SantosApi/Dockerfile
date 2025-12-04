@@ -9,8 +9,8 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 # --- ATENÇÃO: Substitua 'NomeDoSeuProjeto' pelo nome real do seu arquivo .csproj ---
-COPY ["ProjetoSantos.csproj", "."]
-RUN dotnet restore "./ProjetoSantos.csproj"
+COPY ["SantosApi.csproj", "."]
+RUN dotnet restore "./SantosApi.csproj"
 
 COPY . .
 WORKDIR "/src/."
