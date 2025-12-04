@@ -24,7 +24,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
 // 3. CONFIGURAÇÃO DA AUTENTICAÇÃO (JWT)
 // ==============================================================================
 var key = Encoding.ASCII.GetBytes(
-    builder.Configuration["JwtSettings:Key"] 
+    builder.Configuration["JwtSettings:Key"]
     ?? "chave_super_secreta_padrao_para_nao_quebrar_se_faltar_config"
 );
 
@@ -72,14 +72,46 @@ builder.Services.AddCors(options =>
     });
 });
 
+// ==============================================================================
+// 5. CONTROLLERS + SWAGGER (COM JWT ATIVADO)
+// ==============================================================================
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new() { Title = "SantosApi", Version = "v1" });
+
+    // 🔐 CONFIGURAÇÃO DO JWT NO SWAGGER
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Description = "Autenticação JWT usando o esquema Bearer.\n\nDigite assim: Bearer {seu_token_jwt}",
+        Name = "Authorization",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 
 var app = builder.Build();
 
 // ==============================================================================
-// 5. PIPELINE
+// 6. PIPELINE
 // ==============================================================================
 app.UseSwagger();
 app.UseSwaggerUI();
@@ -94,7 +126,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 // ==============================================================================
-// 6. MIGRAÇÃO AUTOMÁTICA + SEED (ROLES)
+// 7. MIGRAÇÃO AUTOMÁTICA + SEED (ROLES)
 // ==============================================================================
 using (var scope = app.Services.CreateScope())
 {
@@ -106,8 +138,8 @@ using (var scope = app.Services.CreateScope())
         logger.LogInformation("Iniciando Migração do Banco de Dados...");
 
         var context = services.GetRequiredService<AppDbContext>();
-        context.Database.Migrate(); 
-        
+        context.Database.Migrate();
+
         logger.LogInformation("Migração concluída com sucesso!");
 
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
@@ -129,7 +161,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // ==============================================================================
-// 7. CONFIGURA A PORTA DINÂMICA DO RENDER (OBRIGATÓRIO)
+// 8. CONFIGURA A PORTA DINÂMICA DO RENDER (OBRIGATÓRIO)
 // ==============================================================================
 var port = Environment.GetEnvironmentVariable("PORT") ?? "5101";
 app.Urls.Add($"http://0.0.0.0:{port}");
