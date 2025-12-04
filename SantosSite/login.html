@@ -30,36 +30,36 @@
     </div>
 
     <script>
-        document.getElementById('formLogin').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const senha = document.getElementById('senha').value;
-            const msgErro = document.getElementById('msgErro');
+    document.getElementById('formLogin').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const senha = document.getElementById('senha').value;
+        const msgErro = document.getElementById('msgErro');
 
-            try {
-                const response = await fetch('http://localhost:5101/api/Auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, senha })
-                });
+        try {
+            const response = await fetch('https://santos-api-uz5r.onrender.com/api/Auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, senha })
+            });
 
-                if (response.ok) {
-                    const data = await response.json();
-                    // SALVA O TOKEN NO NAVEGADOR
-                    localStorage.setItem('santosToken', data.token);
-                    // Manda para o painel
-                    window.location.href = 'admin.html';
-                } else {
-                    msgErro.innerText = "E-mail ou senha incorretos.";
-                    msgErro.style.display = 'block';
-                }
-            } catch (error) {
-                console.error(error);
-                msgErro.innerText = "Erro ao conectar com servidor.";
+            if (response.ok) {
+                const data = await response.json();
+                // SALVA O TOKEN NO NAVEGADOR
+                localStorage.setItem('santosToken', data.token);
+                // Manda para o painel
+                window.location.href = 'admin.html';
+            } else {
+                msgErro.innerText = "E-mail ou senha incorretos.";
                 msgErro.style.display = 'block';
             }
-        });
+        } catch (error) {
+            console.error(error);
+            msgErro.innerText = "Erro ao conectar com servidor.";
+            msgErro.style.display = 'block';
+        }
+    });
     </script>
 </body>
 </html>

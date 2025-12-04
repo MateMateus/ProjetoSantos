@@ -85,30 +85,31 @@
     </div>
 
 <script>
-        // 1. CONFIGURA O BOTÃO DE LOGIN NO TOPO
-        const token = localStorage.getItem('santosToken');
-        const areaLogin = document.getElementById('areaLogin');
+    // 1. CONFIGURA O BOTÃO DE LOGIN NO TOPO
+    const token = localStorage.getItem('santosToken');
+    const areaLogin = document.getElementById('areaLogin');
 
-        if (token) {
-            areaLogin.innerHTML = `<a href="admin.html" class="btn btn-primary btn-sm fw-bold">⚙️ Painel Admin</a>`;
-        } else {
-            areaLogin.innerHTML = `<a href="login.html" class="btn btn-outline-dark btn-sm fw-bold">🔒 Login Admin</a>`;
+    if (token) {
+        areaLogin.innerHTML = `<a href="admin.html" class="btn btn-primary btn-sm fw-bold">⚙️ Painel Admin</a>`;
+    } else {
+        areaLogin.innerHTML = `<a href="login.html" class="btn btn-outline-dark btn-sm fw-bold">🔒 Login Admin</a>`;
+    }
+
+    // 2. LÓGICA DE CARREGAR OS SANTOS
+    const API_URL = 'https://santos-api-uz5r.onrender.com/api/santos';
+    let todosSantos = []; 
+
+    async function carregarSantos() {
+        try {
+            const response = await fetch(API_URL);
+            todosSantos = await response.json();
+            renderizar(todosSantos);
+        } catch (error) {
+            console.error(error);
+            document.getElementById('lista-santos').innerHTML = '<p class="text-danger text-center">Erro ao carregar (Backend desligado?).</p>';
         }
+    }
 
-        // 2. LÓGICA DE CARREGAR OS SANTOS
-        const API_URL = 'http://localhost:5101/api/santos'; 
-        let todosSantos = []; 
-
-        async function carregarSantos() {
-            try {
-                const response = await fetch(API_URL);
-                todosSantos = await response.json();
-                renderizar(todosSantos);
-            } catch (error) {
-                console.error(error);
-                document.getElementById('lista-santos').innerHTML = '<p class="text-danger text-center">Erro ao carregar (Backend desligado?).</p>';
-            }
-        }
 
         function renderizar(lista) {
             const divLista = document.getElementById('lista-santos');

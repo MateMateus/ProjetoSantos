@@ -198,9 +198,10 @@
     </div>
 
     <script>
-        const params = new URLSearchParams(window.location.search);
-        const id = params.get('id');
-        const API_URL = `http://localhost:5101/api/santos/${id}`;
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    // API pública + id do santo
+    const API_URL = `https://santos-api-uz5r.onrender.com/api/santos/${id}`;
 
         // Função para gerar cor mais escura
         function escurecerCor(cor, porcentagem) {

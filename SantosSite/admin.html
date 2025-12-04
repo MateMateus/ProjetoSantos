@@ -140,21 +140,22 @@
     </div>
 
     <script>
-        const token = localStorage.getItem('santosToken');
-        if (!token) { alert("🔒 Login necessário!"); window.location.href = "login.html"; }
-        function sair() { localStorage.removeItem('santosToken'); window.location.href = "login.html"; }
+    const token = localStorage.getItem('santosToken');
+    if (!token) { alert("🔒 Login necessário!"); window.location.href = "login.html"; }
+    function sair() { localStorage.removeItem('santosToken'); window.location.href = "login.html"; }
 
-        const API_URL = 'http://localhost:5101/api/santos';
-        
-        carregarTudo();
+    // <-- URL pública da API no Render -->
+    const API_URL = 'https://santos-api-uz5r.onrender.com/api/santos';
+    
+    carregarTudo();
 
-        async function carregarTudo() {
-            try {
-                const res = await fetch(API_URL);
-                const santos = await res.json();
-                renderizarTabela(santos);
-            } catch (err) { console.error(err); }
-        }
+    async function carregarTudo() {
+        try {
+            const res = await fetch(API_URL, { headers: { 'Authorization': `Bearer ${token}` }});
+            const santos = await res.json();
+            renderizarTabela(santos);
+        } catch (err) { console.error(err); }
+    }
 
         function renderizarTabela(santos) {
             const tbody = document.getElementById('tabela-santos');

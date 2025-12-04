@@ -8,9 +8,8 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // ==============================================================================
-// 1. CONFIGURAÇÃO DO BANCO DE DADOS (PostgreSQL)
+// 1. CONFIGURAÇÃO DO BANCO DE DADOS (PostgreSQL - Render)
 // ==============================================================================
-// O Render injeta a Connection String automaticamente na variável de ambiente
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -24,35 +23,53 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
 // ==============================================================================
 // 3. CONFIGURAÇÃO DA AUTENTICAÇÃO (JWT)
 // ==============================================================================
-var key = Encoding.ASCII.GetBytes(builder.Configuration["JwtSettings:Key"] ?? "chave_super_secreta_padrao_para_nao_quebrar_se_faltar_config"); 
+var key = Encoding.ASCII.GetBytes(
+    builder.Configuration["JwtSettings:Key"] 
+    ?? "chave_super_secreta_padrao_para_nao_quebrar_se_faltar_config"
+);
 
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
+})
+.AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false; // Em produção no Render, o SSL é gerido pelo load balancer, mas pode deixar false se necessário
+    options.RequireHttpsMetadata = false; // OK no Render (SSL via load balancer)
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = false, // Em produção, considere setar para true e definir o Issuer
+        ValidateIssuer = false,
         ValidateAudience = false
     };
 });
 
 // ==============================================================================
-// 4. CONFIGURAÇÃO DO CORS E OUTROS SERVIÇOS
+// 4. CONFIGURAÇÃO DO CORS (Netlify + Render)
 // ==============================================================================
+
+// ⚠️ ALTERE este domínio para o seu site no Netlify!
+var netlifyOrigin = "https://seu-site.netlify.app";
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        builder => builder
-        .AllowAnyOrigin()
-        .AllowAnyMethod()
-        .AllowAnyHeader());
+    options.AddPolicy("AllowNetlify", policy =>
+    {
+        policy.WithOrigins(netlifyOrigin)
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+
+    // Política total para testes (opcional)
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
 });
 
 builder.Services.AddControllers();
@@ -62,15 +79,14 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // ==============================================================================
-// 5. PIPELINE DE EXECUÇÃO (Middleware)
+// 5. PIPELINE
 // ==============================================================================
-
-// Swagger
-// Dica: Mantive fora do "if Development" para você conseguir testar no Render
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseCors("AllowAll"); 
+// ⚠️ EM PRODUÇÃO USE: app.UseCors("AllowNetlify");
+// Durante testes pode usar AllowAll:
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -78,43 +94,44 @@ app.UseAuthorization();
 app.MapControllers();
 
 // ==============================================================================
-// 6. BLOCO DE INICIALIZAÇÃO DO BANCO (A CORREÇÃO ESTÁ AQUI)
+// 6. MIGRAÇÃO AUTOMÁTICA + SEED (ROLES)
 // ==============================================================================
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var logger = services.GetRequiredService<ILogger<Program>>();
 
-    try 
+    try
     {
         logger.LogInformation("Iniciando Migração do Banco de Dados...");
 
-        // PASSO CRUCIAL: Aplica as Migrations
-        // Isso cria as tabelas (AspNetUsers, AspNetRoles) se elas não existirem.
         var context = services.GetRequiredService<AppDbContext>();
         context.Database.Migrate(); 
         
         logger.LogInformation("Migração concluída com sucesso!");
 
-        // PASSO DE SEED: Cria perfis iniciais
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
         string[] roleNames = { "Admin", "User" };
-        
+
         foreach (var roleName in roleNames)
         {
-            // Agora é seguro chamar RoleExistsAsync porque o Migrate() acima garantiu que a tabela existe
             if (!await roleManager.RoleExistsAsync(roleName))
             {
                 await roleManager.CreateAsync(new IdentityRole(roleName));
-                logger.LogInformation($"Role '{roleName}' criada com sucesso.");
+                logger.LogInformation($"Role '{roleName}' criada.");
             }
         }
     }
     catch (Exception ex)
     {
-        // Log detalhado para aparecer no console do Render se der erro
-        logger.LogError(ex, "ERRO CRÍTICO durante a migração ou seed do banco de dados.");
+        logger.LogError(ex, "ERRO durante a migração ou seed.");
     }
 }
+
+// ==============================================================================
+// 7. CONFIGURA A PORTA DINÂMICA DO RENDER (OBRIGATÓRIO)
+// ==============================================================================
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5101";
+app.Urls.Add($"http://0.0.0.0:{port}");
 
 app.Run();
