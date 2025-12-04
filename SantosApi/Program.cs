@@ -7,37 +7,45 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Configura o Banco de Dados (PostgreSQL)
+// ==============================================================================
+// 1. CONFIGURAÇÃO DO BANCO DE DADOS (PostgreSQL)
+// ==============================================================================
 // O Render injeta a Connection String automaticamente na variável de ambiente
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 2. Configura o sistema de Login (Identity)
+// ==============================================================================
+// 2. CONFIGURAÇÃO DO IDENTITY (Sistema de Login)
+// ==============================================================================
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-// 3. Configura a Autenticação (JWT)
-// Nota: Em produção, garanta que "JwtSettings:Key" esteja nas variáveis de ambiente do Render também
+// ==============================================================================
+// 3. CONFIGURAÇÃO DA AUTENTICAÇÃO (JWT)
+// ==============================================================================
 var key = Encoding.ASCII.GetBytes(builder.Configuration["JwtSettings:Key"] ?? "chave_super_secreta_padrao_para_nao_quebrar_se_faltar_config"); 
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false;
+    options.RequireHttpsMetadata = false; // Em produção no Render, o SSL é gerido pelo load balancer, mas pode deixar false se necessário
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = false,
+        ValidateIssuer = false, // Em produção, considere setar para true e definir o Issuer
         ValidateAudience = false
     };
 });
 
-// 4. Configura o CORS (Permite acesso externo)
+// ==============================================================================
+// 4. CONFIGURAÇÃO DO CORS E OUTROS SERVIÇOS
+// ==============================================================================
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -53,17 +61,14 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// --- ÁREA DE EXECUÇÃO ---
+// ==============================================================================
+// 5. PIPELINE DE EXECUÇÃO (Middleware)
+// ==============================================================================
 
-// Swagger (Pode manter no if Development ou tirar o if para ver no Render)
-if (app.Environment.IsDevelopment()) 
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-// Se quiser ver o Swagger no Render (Produção), descomente as linhas abaixo e comente o bloco if acima:
-// app.UseSwagger();
-// app.UseSwaggerUI();
+// Swagger
+// Dica: Mantive fora do "if Development" para você conseguir testar no Render
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseCors("AllowAll"); 
 
@@ -72,35 +77,43 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// ** BLOCO DE INICIALIZAÇÃO DO BANCO **
+// ==============================================================================
+// 6. BLOCO DE INICIALIZAÇÃO DO BANCO (A CORREÇÃO ESTÁ AQUI)
+// ==============================================================================
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
 
     try 
     {
-        // PASSO 1: Aplica as Migrations (Cria as tabelas AspNetRoles, AspNetUsers, etc.)
-        // Isso resolve o erro "relation does not exist"
+        logger.LogInformation("Iniciando Migração do Banco de Dados...");
+
+        // PASSO CRUCIAL: Aplica as Migrations
+        // Isso cria as tabelas (AspNetUsers, AspNetRoles) se elas não existirem.
         var context = services.GetRequiredService<AppDbContext>();
         context.Database.Migrate(); 
+        
+        logger.LogInformation("Migração concluída com sucesso!");
 
-        // PASSO 2: Seed Automático (Cria os perfis Admin e User)
-        // Agora seguro de rodar porque as tabelas já existem
+        // PASSO DE SEED: Cria perfis iniciais
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
         string[] roleNames = { "Admin", "User" };
+        
         foreach (var roleName in roleNames)
         {
+            // Agora é seguro chamar RoleExistsAsync porque o Migrate() acima garantiu que a tabela existe
             if (!await roleManager.RoleExistsAsync(roleName))
             {
                 await roleManager.CreateAsync(new IdentityRole(roleName));
+                logger.LogInformation($"Role '{roleName}' criada com sucesso.");
             }
         }
     }
     catch (Exception ex)
     {
-        // Log de erro caso algo falhe na migração (útil para debug no Render)
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Ocorreu um erro ao migrar ou semear o banco de dados.");
+        // Log detalhado para aparecer no console do Render se der erro
+        logger.LogError(ex, "ERRO CRÍTICO durante a migração ou seed do banco de dados.");
     }
 }
 
