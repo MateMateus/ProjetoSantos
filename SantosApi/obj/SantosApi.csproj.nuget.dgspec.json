@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\mbrag\\Downloads\\ProjetoSantos\\SantosApi\\SantosApi.csproj": {}
+    "C:\\Users\\mbrag\\Downloads\\ProjetoSantos\\santosapi\\SantosApi.csproj": {}
   },
   "projects": {
-    "C:\\Users\\mbrag\\Downloads\\ProjetoSantos\\SantosApi\\SantosApi.csproj": {
+    "C:\\Users\\mbrag\\Downloads\\ProjetoSantos\\santosapi\\SantosApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mbrag\\Downloads\\ProjetoSantos\\SantosApi\\SantosApi.csproj",
+        "projectUniqueName": "C:\\Users\\mbrag\\Downloads\\ProjetoSantos\\santosapi\\SantosApi.csproj",
         "projectName": "SantosApi",
-        "projectPath": "C:\\Users\\mbrag\\Downloads\\ProjetoSantos\\SantosApi\\SantosApi.csproj",
+        "projectPath": "C:\\Users\\mbrag\\Downloads\\ProjetoSantos\\santosapi\\SantosApi.csproj",
         "packagesPath": "C:\\Users\\mbrag\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\mbrag\\Downloads\\ProjetoSantos\\SantosApi\\obj\\",
+        "outputPath": "C:\\Users\\mbrag\\Downloads\\ProjetoSantos\\santosapi\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
