@@ -17,7 +17,7 @@ namespace SantosApi.Controllers
         [HttpPost("make-admin")]
         public async Task<IActionResult> MakeAdmin()
         {
-            var user = await _userManager.FindByEmailAsync("MateusBragaSaen@gmail.com");
+            var user = await _userManager.FindByEmailAsync("mateusbragasan@gmail.com");
 
             if (user == null)
                 return NotFound("Usuário não encontrado.");
