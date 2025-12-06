@@ -115,6 +115,19 @@ var app = builder.Build();
 // 6. PIPELINE
 // ==============================================================================
 app.UseSwagger();
+app.Use(async (context, next) =>
+{
+    if (context.Request.Headers.ContainsKey("X-Forwarded-Proto") &&
+        context.Request.Headers["X-Forwarded-Proto"] == "http")
+    {
+        var httpsUrl = "https://" + context.Request.Host + context.Request.Path + context.Request.QueryString;
+        context.Response.Redirect(httpsUrl);
+        return;
+    }
+
+    await next();
+});
+
 app.UseSwaggerUI();
 
 app.UseCors("AllowAll");
