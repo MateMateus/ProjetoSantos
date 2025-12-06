@@ -35,7 +35,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false; // OK no Render (SSL via load balancer)
+    options.RequireHttpsMetadata = false; // Render usa proxy SSL
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -49,8 +49,6 @@ builder.Services.AddAuthentication(options =>
 // ==============================================================================
 // 4. CONFIGURAÇÃO DO CORS (Netlify + Render)
 // ==============================================================================
-
-// ⚠️ ALTERE este domínio para o seu site no Netlify!
 var netlifyOrigin = "https://seu-site.netlify.app";
 
 builder.Services.AddCors(options =>
@@ -63,7 +61,6 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 
-    // Política total para testes (opcional)
     options.AddPolicy("AllowAll", policy =>
     {
         policy.AllowAnyOrigin()
@@ -82,10 +79,14 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "SantosApi", Version = "v1" });
 
-    // 🔐 CONFIGURAÇÃO DO JWT NO SWAGGER
+    // 🔐 CONFIGURAÇÃO COMPLETA DO JWT NO SWAGGER
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
-        Description = "Autenticação JWT usando o esquema Bearer.\n\nDigite assim: Bearer {seu_token_jwt}",
+        Description =
+            "Autenticação JWT usando Bearer.\n\n" +
+            "⚠️ DIGITE ASSIM:\n\n" +
+            "Bearer {seu_token_jwt}\n\n" +
+            "Incluindo a palavra Bearer e um espaço.",
         Name = "Authorization",
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
         Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
@@ -116,8 +117,6 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// ⚠️ EM PRODUÇÃO USE: app.UseCors("AllowNetlify");
-// Durante testes pode usar AllowAll:
 app.UseCors("AllowAll");
 
 app.UseAuthentication();
