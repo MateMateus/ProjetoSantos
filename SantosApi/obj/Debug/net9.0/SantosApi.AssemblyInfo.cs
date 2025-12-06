@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SantosApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dcfd8f5801706dcf6db5d1e092fd2a8ff87efef9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6de619d98525b064eb29f99575c5bc95e4f574e8")]
 [assembly: System.Reflection.AssemblyProductAttribute("SantosApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SantosApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
