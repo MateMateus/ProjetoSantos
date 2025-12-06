@@ -79,18 +79,15 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "SantosApi", Version = "v1" });
 
-    // 🔐 CONFIGURAÇÃO COMPLETA DO JWT NO SWAGGER
+    // Definição correta para Bearer JWT (use Http + scheme "bearer")
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
-        Description =
-            "Autenticação JWT usando Bearer.\n\n" +
-            "⚠️ DIGITE ASSIM:\n\n" +
-            "Bearer {seu_token_jwt}\n\n" +
-            "Incluindo a palavra Bearer e um espaço.",
+        Description = "Autenticação JWT usando o esquema Bearer.\n\nDigite: Bearer {seu_token_jwt}",
         Name = "Authorization",
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http, // <- importante
+        Scheme = "bearer",
+        BearerFormat = "JWT"
     });
 
     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
@@ -102,12 +99,16 @@ builder.Services.AddSwaggerGen(c =>
                 {
                     Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
                     Id = "Bearer"
-                }
+                },
+                Scheme = "bearer",
+                Name = "Bearer",
+                In = Microsoft.OpenApi.Models.ParameterLocation.Header,
             },
             new string[] {}
         }
     });
 });
+
 
 var app = builder.Build();
 
