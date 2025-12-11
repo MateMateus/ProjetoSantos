@@ -1,132 +1,146 @@
-*✝️ Santos Católicos - Enciclopédia Digital*
 
 
-Uma aplicação web Fullstack para catalogar, buscar e gerenciar informações sobre Santos da Igreja Católica, incluindo suas histórias, dias de festa e padroados.
+# ✝️ Santos Católicos — Enciclopédia Digital
 
-📸 Preview
+> **Status:** Online 🟢
 
+Uma aplicação web **Fullstack** para catalogar, buscar e gerenciar informações sobre Santos da Igreja Católica, preservando suas histórias, dias de festa e padroados.
 
-[(https://santospedia.netlify.app/)](https://santospedia.netlify.app/)
+O objetivo é facilitar o acesso à hagiografia (história dos santos) através de uma interface moderna, responsiva e de fácil navegação.
 
-🚀 Sobre o Projeto
+-----
 
+## 📸 Preview
 
-Este projeto foi desenvolvido para facilitar o acesso à hagiografia (história dos santos) de forma moderna e responsiva. O sistema conta com uma área pública de consulta e uma área administrativa protegida para gerenciamento do conteúdo.
+Acesse o projeto online: **[santospedia.netlify.app](https://santospedia.netlify.app/)**
 
-Funcionalidades Principais
+*(Substitua este link acima por um print real da sua tela)*
 
-Público:
+-----
 
+## 🚀 Funcionalidades
 
-🕊️ Listagem de Santos com fotos e resumos.
+O sistema é dividido em dois módulos de acesso:
 
-🔍 Busca em tempo real por nome ou padroeiro (ex: "Protetor dos animais").
+### 🕊️ Área Pública
 
-📖 Página de detalhes com biografia completa.
+  * **Catálogo Visual:** Listagem de santos com fotos e resumos biográficos.
+  * **Busca Inteligente:** Pesquisa em tempo real por nome ou padroeiro (ex: *"Protetor dos animais"*).
+  * **Detalhes:** Página dedicada com a biografia completa e datas comemorativas.
 
-Administrativo (Painel Admin):
+### 🔒 Área Administrativa (Painel Admin)
 
+  * **Autenticação:** Login seguro para administradores.
+  * **Gestão de Conteúdo:**
+      * ➕ **Create:** Cadastro de novos santos.
+      * ✏️ **Update:** Edição de informações existentes.
+      * ❌ **Delete:** Remoção de registros.
 
-🔒 Autenticação de usuários.
+-----
 
-➕ Cadastro de novos santos (Create).
+## 🛠️ Tecnologias e Arquitetura
 
-✏️ Edição e Exclusão de registros (Update/Delete).
+O projeto utiliza uma arquitetura **Client-Server desacoplada**, onde o Frontend e o Backend operam em ambientes distintos, comunicando-se via API REST.
 
-🛠️ Tecnologias e Arquitetura
+### 🎨 Frontend (Cliente)
 
-O projeto utiliza uma arquitetura Client-Server desacoplada, hospedada em serviços de nuvem gratuitos.
+  * **Hospedagem:** [Netlify](https://www.netlify.com/)
+  * **Linguagens:** HTML5, CSS3 (Responsivo), JavaScript (Vanilla/ES6+).
+  * **Comunicação:** Utiliza `Fetch API` para consumir os dados do backend.
 
-Frontend (Cliente)
+### ⚙️ Backend (Servidor API)
 
-Hospedagem: Netlify
+  * **Hospedagem:** [Render](https://render.com/)
+  * **Runtime:** Node.js
+  * **Framework:** Express (API RESTful)
+  * **Segurança:** Configuração de **CORS** restritivo para aceitar apenas requisições do domínio do Netlify.
 
-Tecnologias: HTML5, CSS3 (Responsivo), JavaScript (Vanilla/ES6+).
+### 🗄️ Banco de Dados
 
-Destaques: Uso de fetch API para comunicação assíncrona com o backend.
+  * **SGBD:** PostgreSQL
+  * **Hospedagem:** Render (PostgreSQL Instance)
 
-Backend (Servidor API)
+> **Nota sobre Integração:** O maior desafio técnico foi orquestrar a comunicação segura entre o Netlify (Front) e o Render (Back/DB), garantindo que as requisições Cross-Origin (CORS) fossem processadas corretamente.
 
-Hospedagem: Render
+-----
 
-Tecnologias: Node.js, Express (API RESTful).
+## 💻 Como Rodar Localmente
 
-Segurança: Configuração de CORS para permitir requisições apenas do domínio do Frontend.
+Siga os passos abaixo para executar o projeto em sua máquina.
 
-Banco de Dados
+### Pré-requisitos
 
-SGBD: PostgreSQL.
+  * [Node.js](https://nodejs.org/) instalado.
+  * [Git](https://git-scm.com/) instalado.
+  * PostgreSQL instalado localmente (opcional, caso não conecte no banco da nuvem).
 
-Hospedagem: Render (PostgreSQL Instance) / Migração planejada para Supabase para persistência de longo prazo.
+### 1\. Clonar o Repositório
 
-
-🧩 Como Funciona a Integração
-
-
-O desafio técnico principal deste projeto foi a integração entre dois ambientes de nuvem distintos:
-
-O Frontend (Netlify) faz requisições HTTP para a API.
-
-A API (Render) processa a requisição, aplica regras de negócio e consulta o Banco de Dados.
-
-O PostgreSQL retorna os dados, que são enviados de volta ao Frontend em formato JSON.
-
-Nota sobre CORS: Foi necessário configurar o Cross-Origin Resource Sharing (CORS) no servidor Node.js para aceitar as chamadas vindas do domínio do Netlify, garantindo a segurança da comunicação.
-
-💻 Como Rodar Localmente
-
-
-Pré-requisitos
-
-Node.js instalado.
-Git instalado.
-
-
-1. Clonar o Repositório
-
-
-git clone [https://github.com/SEU-USUARIO/santos-catolicos.git](https://github.com/SEU-USUARIO/santos-catolicos.git)
-
+```bash
+git clone https://github.com/SEU-USUARIO/santos-catolicos.git
 cd santos-catolicos
+```
 
+### 2\. Configurar o Backend
 
+Navegue até a pasta do servidor e instale as dependências:
 
-2. Configurar o Backend
-
-
+```bash
 cd backend
-
 npm install
+```
 
+Crie um arquivo `.env` na raiz da pasta `backend` com suas credenciais (exemplo):
+
+```env
+DATABASE_URL=sua_string_conexao_postgres
+PORT=3000
+```
+
+Inicie o servidor:
+
+```bash
 npm start
+# O servidor rodará em http://localhost:3000
+```
 
-3. Configurar o Frontend
+### 3\. Configurar o Frontend
 
+1.  Vá até a pasta do frontend (raiz ou `frontend/`).
+2.  Abra o arquivo de configuração da API (ex: `js/api.js` ou `script.js`).
+3.  Altere a URL base da API de produção para local:
 
-Vá até a pasta do frontend.
+<!-- end list -->
 
-Abra o arquivo de configuração da API (ex: js/api.js).
+```javascript
+// const API_URL = "https://sua-api-no-render.com";
+const API_URL = "http://localhost:3000";
+```
 
-Altere a URL base para http://localhost:3000.
+4.  Abra o arquivo `index.html` no seu navegador ou use uma extensão como **Live Server** no VS Code.
 
-Abra o index.html no navegador (ou use o Live Server do VS Code).
+-----
 
+## 🚧 Roadmap e Melhorias Futuras
 
-🚧 Melhorias Futuras
+  - [ ] **Migração de Banco de Dados:** Migrar do Render para o **Supabase** para garantir persistência a longo prazo e evitar limitações do plano gratuito.
+  - [ ] **Upload de Imagens:** Implementar upload real de arquivos (atualmente utiliza URLs de imagens externas).
+  - [ ] **Dark Mode:** Implementar tema escuro para melhor acessibilidade noturna.
 
+-----
 
-[ ] Migração do Banco de Dados para Supabase (para evitar a expiração do plano gratuito do Render).
+## 🤝 Contribuição
 
-[ ] Implementação de Upload de Imagens (atualmente usa URLs externas).
+Contribuições são muito bem-vindas\!
 
-[ ] Modo Escuro (Dark Mode).
+1.  Faça um Fork do projeto.
+2.  Crie uma Branch para sua Feature (`git checkout -b feature/NovaFeature`).
+3.  Faça o Commit (`git commit -m 'Adicionando nova feature'`).
+4.  Faça o Push (`git push origin feature/NovaFeature`).
+5.  Abra um Pull Request.
 
+-----
 
-🤝 Contribuição
-
-
-Contribuições são bem-vindas! Sinta-se à vontade para abrir uma issue ou enviar um Pull Request.
-
-<p align="center">
+\<p align="center"\>
 Desenvolvido com fé e código 💜
-</p>
+\</p\>
