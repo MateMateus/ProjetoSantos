@@ -24,16 +24,27 @@ Administrativo (Painel Admin):
 🛠️ Tecnologias e Arquitetura
 
 O projeto utiliza uma arquitetura Client-Server desacoplada, hospedada em serviços de nuvem gratuitos.
+
 Frontend (Cliente)
+
 Hospedagem: Netlify
+
 Tecnologias: HTML5, CSS3 (Responsivo), JavaScript (Vanilla/ES6+).
+
 Destaques: Uso de fetch API para comunicação assíncrona com o backend.
+
 Backend (Servidor API)
+
 Hospedagem: Render
+
 Tecnologias: Node.js, Express (API RESTful).
+
 Segurança: Configuração de CORS para permitir requisições apenas do domínio do Frontend.
+
 Banco de Dados
+
 SGBD: PostgreSQL.
+
 Hospedagem: Render (PostgreSQL Instance) / Migração planejada para Supabase para persistência de longo prazo.
 
 🧩 Como Funciona a Integração
@@ -55,9 +66,6 @@ cd santos-catolicos
 2. Configurar o Backend
 cd backend
 npm install
-# Crie um arquivo .env com as credenciais do banco
-# DATABASE_URL=postgres://user:pass@host:port/db
-# PORT=3000
 npm start
 
 3. Configurar o Frontend
