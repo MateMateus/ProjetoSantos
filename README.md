@@ -16,8 +16,11 @@ Público:
 
 Administrativo (Painel Admin):
 🔒 Autenticação de usuários.
+
 ➕ Cadastro de novos santos (Create).
+
 ✏️ Edição e Exclusão de registros (Update/Delete).
+
 🛠️ Tecnologias e Arquitetura
 
 O projeto utiliza uma arquitetura Client-Server desacoplada, hospedada em serviços de nuvem gratuitos.
