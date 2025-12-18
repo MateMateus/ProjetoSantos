@@ -29,15 +29,6 @@
             margin-bottom: 120px; 
         }
 
-        .banner-santo {
-            height: 400px;
-            width: 100%;
-            background-color: #ddd; /* Cor padrão, JS muda */
-            border-bottom-left-radius: 50% 20%;
-            border-bottom-right-radius: 50% 20%;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        }
 
         /* CORREÇÃO DA POSIÇÃO DA FOTO */
         .perfil-wrapper {
@@ -134,14 +125,17 @@
 /* HERO */
 .banner-santo {
   height: 420px;
+  width: 100%;
   background: linear-gradient(
     135deg,
     var(--cor-santo) 0%,
     #ffffff 100%
-  );
+  ) !important;
+
   border-bottom-left-radius: 60% 20%;
   border-bottom-right-radius: 60% 20%;
 }
+
 
 /* BADGE CATEGORIA */
 .badge-categoria {
